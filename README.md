@@ -30,6 +30,16 @@ une erreur `RLS_OK [anon alpha beta cabinet decision]` (le script s'annule lui-m
 - `supabase/migrations/` : schéma, RLS, stockage privé `pieces`.
 - `supabase/seed.sql` : jeu fictif du PRD.
 - `supabase/lier-comptes.sql` : rattacher les comptes créés dans Authentication aux rôles cabinet / syndic.
+- `supabase/reinitialiser-demo.sql` : remettre le jeu fictif dans son état initial avant une démonstration.
+
+## Documentation
+
+- `docs/PRD.md` : besoin et périmètre.
+- `docs/analyse-fonctionnelle.md` : fonctions couvertes, écarts avec la maquette, points à trancher.
+- `docs/recette.md` : résultats des tests, parcours manuel, réglages de sécurité Supabase à faire.
+- `maquette/pieces-fictives/` : PDF fictifs à déposer sur les pièces du jeu de démonstration.
+
+En ligne : https://portail-recouvrement.vercel.app (redéployé automatiquement à chaque push sur `main`).
 
 ## Règles importantes
 

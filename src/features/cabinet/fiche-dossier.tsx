@@ -14,6 +14,14 @@ import type { Dossier, Etape, Piece, Validation } from '@/lib/recouvrement/types
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
@@ -207,6 +215,8 @@ function Pieces({ dossier, pieces, validations }: { dossier: Dossier; pieces: Pi
   const champFichier = useRef<HTMLInputElement>(null)
   const remplacement = useRef<HTMLInputElement>(null)
   const [pieceARemplacer, setPieceARemplacer] = useState<Piece | null>(null)
+  const [pieceAValider, setPieceAValider] = useState<Piece | null>(null)
+  const [objet, setObjet] = useState('')
   const enAttente = new Set(validations.filter((v) => v.statut === 'en_attente').map((v) => v.piece_id))
 
   return (
@@ -236,8 +246,8 @@ function Pieces({ dossier, pieces, validations }: { dossier: Dossier; pieces: Pi
                     variant='secondary'
                     disabled={demander.isPending}
                     onClick={() => {
-                      const objet = window.prompt('Objet de la validation', p.nom.replace(/\s*\(PDF\)$/i, ''))
-                      if (objet?.trim()) demander.mutate({ dossier, piece_id: p.id, objet: objet.trim() })
+                      setPieceAValider(p)
+                      setObjet(p.nom.replace(/\s*\(PDF\)$/i, ''))
                     }}
                   >
                     <Send /> Demander la validation
@@ -254,6 +264,49 @@ function Pieces({ dossier, pieces, validations }: { dossier: Dossier; pieces: Pi
         ) : (
           <p className='text-sm text-muted-foreground'>Aucune pièce.</p>
         )}
+
+        <Dialog open={!!pieceAValider} onOpenChange={(o) => !o && setPieceAValider(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Demander la validation du syndic</DialogTitle>
+              <DialogDescription>
+                Le syndic verra l’acte dans « En attente de votre validation » et pourra le valider ou demander une
+                modification.
+              </DialogDescription>
+            </DialogHeader>
+            <form
+              id='form-demande-validation'
+              className='grid gap-2'
+              onSubmit={(e) => {
+                e.preventDefault()
+                if (!pieceAValider || !objet.trim()) return
+                demander.mutate(
+                  { dossier, piece_id: pieceAValider.id, objet: objet.trim() },
+                  { onSuccess: () => setPieceAValider(null) }
+                )
+              }}
+            >
+              <Label htmlFor='objet-validation'>Objet</Label>
+              <Input
+                id='objet-validation'
+                value={objet}
+                onChange={(e) => setObjet(e.target.value)}
+                required
+                maxLength={200}
+                placeholder='Projet d’assignation'
+              />
+              <p className='text-xs text-muted-foreground'>Pièce : {pieceAValider?.nom}</p>
+            </form>
+            <DialogFooter>
+              <Button variant='outline' onClick={() => setPieceAValider(null)}>
+                Annuler
+              </Button>
+              <Button type='submit' form='form-demande-validation' disabled={!objet.trim() || demander.isPending}>
+                <Send /> Envoyer au syndic
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <input
           ref={remplacement}
