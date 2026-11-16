@@ -26,7 +26,9 @@ Site : https://portail-recouvrement.vercel.app. Base : Supabase `otbeppqvdvmcqdl
 | # | Étape | Compte | Attendu | Vérifié |
 | --- | --- | --- | --- | --- |
 | 1 | Créer un dossier pour Syndic Alpha, étape mise en demeure | cabinet | Le dossier apparaît dans le portefeuille | ☐ |
-| 2 | Déposer un projet d'acte et demander la validation, avec une note visible | cabinet | « Validation attendue » dans le suivi client | ☐ |
+| 2 | Déposer un projet d'acte et demander la validation, avec une note visible | cabinet | « Validation attendue » dans le suivi client | ✅ en ligne (dépôt des 3 PDF, demande sur B-002, puis réinitialisation) |
+| 2 bis | Portefeuille cabinet | cabinet | 5 dossiers, 23 220,75 €, 1 validation attendue, B-002 (76 j) et A-003 (42 j) à relancer | ✅ en ligne |
+| 2 ter | Ouvrir une pièce | cabinet | PDF ouvert par lien signé temporaire | ✅ en ligne |
 | 3 | Tableau de bord | Alpha | 1 action à valider, audience du 10 déc. 2026 | ✅ en local |
 | 4 | Ouvrir A-002, lire le projet, valider | Alpha | Étape « Assignation validée », décision en lecture seule | ✅ en local |
 | 4 bis | Demander une modification avec un commentaire | Alpha | Commentaire visible côté cabinet | ☐ |
