@@ -12,7 +12,8 @@ import { LIBELLES_STATUT } from '@/lib/recouvrement/etapes'
 import { aujourdhui, formatDateCourte, formatEuros, parseEuros } from '@/lib/recouvrement/format'
 import type { Dossier, Etape, Piece, Validation } from '@/lib/recouvrement/types'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
@@ -213,8 +214,6 @@ function Pieces({ dossier, pieces, validations }: { dossier: Dossier; pieces: Pi
   const [nom, setNom] = useState('')
   const [visible, setVisible] = useState(true)
   const champFichier = useRef<HTMLInputElement>(null)
-  const remplacement = useRef<HTMLInputElement>(null)
-  const [pieceARemplacer, setPieceARemplacer] = useState<Piece | null>(null)
   const [pieceAValider, setPieceAValider] = useState<Piece | null>(null)
   const [objet, setObjet] = useState('')
   const enAttente = new Set(validations.filter((v) => v.statut === 'en_attente').map((v) => v.piece_id))
@@ -230,16 +229,31 @@ function Pieces({ dossier, pieces, validations }: { dossier: Dossier; pieces: Pi
           <ul className='divide-y'>
             {pieces.map((p) => (
               <LignePiece key={p.id} piece={p} montrerInterne>
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  onClick={() => {
-                    setPieceARemplacer(p)
-                    remplacement.current?.click()
-                  }}
+                <label
+                  className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'cursor-pointer')}
+                  title='Déposer ou remplacer le fichier de cette pièce'
                 >
                   <Upload /> Fichier
-                </Button>
+                  <input
+                    type='file'
+                    className='sr-only'
+                    aria-label={`Fichier de la pièce ${p.nom}`}
+                    accept='.pdf,.docx,.png,.jpg,.jpeg'
+                    disabled={deposer.isPending}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0]
+                      if (f)
+                        deposer.mutate({
+                          dossier_id: dossier.id,
+                          fichier: f,
+                          nom: p.nom,
+                          visible_syndic: p.visible_syndic,
+                          pieceExistante: p,
+                        })
+                      e.target.value = ''
+                    }}
+                  />
+                </label>
                 {p.visible_syndic && !enAttente.has(p.id) && (
                   <Button
                     size='sm'
@@ -308,24 +322,6 @@ function Pieces({ dossier, pieces, validations }: { dossier: Dossier; pieces: Pi
           </DialogContent>
         </Dialog>
 
-        <input
-          ref={remplacement}
-          type='file'
-          className='hidden'
-          accept='.pdf,.docx,.png,.jpg,.jpeg'
-          onChange={(e) => {
-            const f = e.target.files?.[0]
-            if (f && pieceARemplacer)
-              deposer.mutate({
-                dossier_id: dossier.id,
-                fichier: f,
-                nom: pieceARemplacer.nom,
-                visible_syndic: pieceARemplacer.visible_syndic,
-                pieceExistante: pieceARemplacer,
-              })
-            e.target.value = ''
-          }}
-        />
 
         <form
           className='grid gap-3 rounded-md border p-3'
